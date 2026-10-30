@@ -40,7 +40,7 @@ def fake_hn() -> HackerNews:
                  "created_at": "2026-01-01T00:00:00Z"} for i, t in enumerate(COMMENTS)
             ] + [{"objectID": "9", "author": "x", "comment_text": "too short", "created_at": ""}]})
         return httpx.Response(200, json={"hits": []})
-    return HackerNews(client=httpx.Client(transport=httpx.MockTransport(handler)))
+    return HackerNews(client=httpx.AsyncClient(transport=httpx.MockTransport(handler)))
 
 
 def scripted_model(*replies: str | None) -> tuple[LLMAnalyst, list[dict]]:
@@ -55,7 +55,7 @@ def scripted_model(*replies: str | None) -> tuple[LLMAnalyst, list[dict]]:
             raise httpx.ReadTimeout("timed out")
         return httpx.Response(200, json={"choices": [{"message": {"content": reply}}]})
 
-    analyst = LLMAnalyst(api_key="test", client=httpx.Client(transport=httpx.MockTransport(handler)))
+    analyst = LLMAnalyst(api_key="test", client=httpx.AsyncClient(transport=httpx.MockTransport(handler)))
     return analyst, calls
 
 

@@ -27,25 +27,25 @@ def names_tool(title: str, tool: str) -> bool:
 
 
 class HackerNews:
-    def __init__(self, client: httpx.Client | None = None):
-        self.client = client or httpx.Client(timeout=20)
+    def __init__(self, client: httpx.AsyncClient | None = None):
+        self.client = client or httpx.AsyncClient(timeout=20)
 
-    def _search(self, **params) -> list[dict]:
-        response = self.client.get(API, params=params)
+    async def _search(self, **params) -> list[dict]:
+        response = await self.client.get(API, params=params)
         response.raise_for_status()
         return response.json().get("hits", [])
 
-    def top_stories(self, tool: str, limit: int = 3) -> list[dict]:
-        stories = self._search(query=tool, tags="story", hitsPerPage=40)
+    async def top_stories(self, tool: str, limit: int = 3) -> list[dict]:
+        stories = await self._search(query=tool, tags="story", hitsPerPage=40)
         relevant = [s for s in stories if s.get("title") and names_tool(s["title"], tool)]
         relevant.sort(key=lambda s: (s.get("num_comments") or 0), reverse=True)
         return relevant[:limit]
 
-    def comments(self, tool: str, stories: int = 3, max_comments: int = 40) -> tuple[list[str], list[Comment]]:
+    async def comments(self, tool: str, stories: int = 3, max_comments: int = 40) -> tuple[list[str], list[Comment]]:
         titles, collected = [], []
-        for story in self.top_stories(tool, stories):
+        for story in await self.top_stories(tool, stories):
             titles.append(story["title"])
-            hits = self._search(tags=f"comment,story_{story['objectID']}", hitsPerPage=100)
+            hits = await self._search(tags=f"comment,story_{story['objectID']}", hitsPerPage=100)
             for hit in hits:
                 text = clean(hit.get("comment_text") or "")
                 if 60 <= len(text) <= 1500:

@@ -3,16 +3,19 @@ name = "devpulse"
 version = "1.0.0"
 description = "What do developers say about a tool? Pros and cons cited from Hacker News."
 requires-python = ">=3.11"
-dependencies = ["httpx>=0.27", "pydantic>=2.7"]
+dependencies = ["httpx>=0.27", "pydantic>=2.7", "fastapi>=0.115"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
+[dependency-groups]
+workers = ["workers-py", "workers-runtime-sdk"]
+
 [project.scripts]
 devpulse = "devpulse.cli:main"
 
-[tool.setuptools]
-packages = ["devpulse"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

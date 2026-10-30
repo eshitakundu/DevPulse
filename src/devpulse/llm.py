@@ -30,16 +30,16 @@ class ModelError(RuntimeError):
 
 class LLMAnalyst:
     def __init__(self, api_key: str | None = None, model: str | None = None,
-                 client: httpx.Client | None = None):
+                 client: httpx.AsyncClient | None = None):
         self.api_key = api_key if api_key is not None else os.getenv("OPENROUTER_API_KEY", "")
         self.model = model or os.getenv("DEVPULSE_MODEL", "openrouter/auto")
-        self.client = client or httpx.Client(timeout=60)
+        self.client = client or httpx.AsyncClient(timeout=60)
 
     @property
     def available(self) -> bool:
         return bool(self.api_key)
 
-    def analyse(self, tool: str, comments: list[Comment], feedback: str | None = None) -> Analysis:
+    async def analyse(self, tool: str, comments: list[Comment], feedback: str | None = None) -> Analysis:
         evidence = "\n\n".join(f"[{c.ref}] {c.text[:900]}" for c in comments)
         messages = [
             {"role": "system", "content": SYSTEM},
@@ -48,7 +48,7 @@ class LLMAnalyst:
         if feedback:
             messages.append({"role": "user", "content": feedback})
         try:
-            response = self.client.post(
+            response = await self.client.post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 headers={"Authorization": f"Bearer {self.api_key}"},
                 json={"model": self.model, "temperature": 0, "messages": messages},

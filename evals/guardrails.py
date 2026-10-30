@@ -9,11 +9,12 @@ Exits non-zero on any failure, so CI blocks regressions.
 """
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path[:0] = [str(ROOT), str(ROOT / "tests")]
+sys.path[:0] = [str(ROOT / "src"), str(ROOT / "tests")]
 
 from devpulse.agent import run_analysis  # noqa: E402
 from devpulse.validator import validate  # noqa: E402
@@ -44,7 +45,7 @@ def main() -> int:
     print(f"{'scenario':38} {'writer':9} {'published':>9} {'rejected':>8}  result")
     for name, replies, expected_writer in SCENARIOS:
         analyst, _ = scripted_model(*replies)
-        analysis, writer, rejected, _ = run_analysis("Widget", evidence, analyst)
+        analysis, writer, rejected, _ = asyncio.run(run_analysis("Widget", evidence, analyst))
         _, ungrounded = validate(analysis, evidence)
         ok = not ungrounded and writer == expected_writer
         failures += not ok

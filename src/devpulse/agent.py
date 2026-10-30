@@ -18,12 +18,12 @@ from .models import Analysis, Comment, Rejection, Report
 from .validator import validate
 
 
-def run_analysis(tool: str, comments: list[Comment], analyst: LLMAnalyst | None) -> tuple[Analysis, str, list[Rejection], list[str]]:
+async def run_analysis(tool: str, comments: list[Comment], analyst: LLMAnalyst | None) -> tuple[Analysis, str, list[Rejection], list[str]]:
     trace: list[str] = [f"retrieved {len(comments)} comments"]
     rejected: list[Rejection] = []
     if analyst is not None and analyst.available and comments:
         try:
-            draft = analyst.analyse(tool, comments)
+            draft = await analyst.analyse(tool, comments)
             kept, dropped = validate(draft, comments)
             trace.append(f"model proposed {len(draft.pros)} pros, {len(draft.cons)} cons; "
                          f"validator rejected {len(dropped)}")
@@ -31,7 +31,7 @@ def run_analysis(tool: str, comments: list[Comment], analyst: LLMAnalyst | None)
             if dropped:
                 feedback = "These points were rejected. Fix or remove them:\n" + "\n".join(
                     f"- {r.side}: {r.point!r} ({r.reason})" for r in dropped)
-                repaired = analyst.analyse(tool, comments, feedback=feedback)
+                repaired = await analyst.analyse(tool, comments, feedback=feedback)
                 kept, dropped = validate(repaired, comments)
                 trace.append(f"repair attempt: validator rejected {len(dropped)}")
                 rejected += dropped
@@ -47,11 +47,11 @@ def run_analysis(tool: str, comments: list[Comment], analyst: LLMAnalyst | None)
     return analysis, "baseline", rejected, trace
 
 
-def investigate(tool: str, hn: HackerNews | None = None, analyst: LLMAnalyst | None = None,
+async def investigate(tool: str, hn: HackerNews | None = None, analyst: LLMAnalyst | None = None,
                 stories: int = 3, max_comments: int = 40) -> Report:
     hn = hn or HackerNews()
-    titles, comments = hn.comments(tool, stories=stories, max_comments=max_comments)
-    analysis, written_by, rejected, trace = run_analysis(tool, comments, analyst)
+    titles, comments = await hn.comments(tool, stories=stories, max_comments=max_comments)
+    analysis, written_by, rejected, trace = await run_analysis(tool, comments, analyst)
     trace.insert(0, f"found {len(titles)} HN threads about {tool!r}")
     return Report(tool=tool, stories=titles, comments=comments, pros=analysis.pros,
                   cons=analysis.cons, written_by=written_by, rejected=rejected, trace=trace)

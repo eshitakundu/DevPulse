@@ -4,3 +4,8 @@ __pycache__/
 .env
 .pytest_cache/
 *.egg-info/
+.venv-workers/
+python_modules/
+src/vendor/
+.wrangler/
+node_modules/
