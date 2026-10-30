@@ -15,5 +15,6 @@
       "database_id": "672ca985-5699-4480-9a1e-8e5395969551"
     }
   ],
+  "routes": [{ "pattern": "devpulse.eshita.dev", "custom_domain": true }],
   "observability": { "enabled": true }
 }

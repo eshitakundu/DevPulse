@@ -4,7 +4,7 @@
 
 **What do developers actually say about a tool? DevPulse reads the Hacker News threads about it and returns pros and cons where every point quotes a real comment and links to it.**
 
-**[Try it live](https://devpulse.eshita-kundu-2026.workers.dev/?tool=Bun)** · runs as a Python Worker on Cloudflare · or from the terminal: `devpulse "Bun"`
+**[Try it live](https://devpulse.eshita.dev/?tool=Bun)** · runs as a Python Worker on Cloudflare · or from the terminal: `devpulse "Bun"`
 
 AI summaries of "what people think" are easy to make and easy to fake: a model can invent a quote or attach a real quote to the wrong person. DevPulse treats the model's answer as a proposal. A validator keeps a point only if its quote appears word for word in the comment it cites, and anything that fails is sent back once for repair, then dropped.
 
