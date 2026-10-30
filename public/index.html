@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevPulse · What developers say about a tool</title>
+  <meta name="description" content="Pros and cons of any developer tool, where every point quotes a real Hacker News comment.">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>DevPulse</h1>
+      <p>What do developers actually say about a tool? Every point below quotes a real Hacker News comment, and links to it.</p>
+    </header>
+
+    <form id="search" class="card">
+      <label for="tool">Tool or library</label>
+      <div class="row">
+        <input id="tool" name="tool" maxlength="40" placeholder="e.g. Bun, Deno, htmx, Tailwind" required autocomplete="off">
+        <button type="submit">Check the pulse</button>
+      </div>
+      <p class="hint">Try: <a href="?tool=Bun">Bun</a> · <a href="?tool=Deno">Deno</a> · <a href="?tool=htmx">htmx</a> · <a href="?tool=SQLite">SQLite</a></p>
+    </form>
+
+    <p id="status" class="status" aria-live="polite"></p>
+
+    <section id="report" class="hidden">
+      <p id="summary" class="meta"></p>
+      <div class="columns">
+        <div class="card"><h2>Pros</h2><ul id="pros"></ul></div>
+        <div class="card"><h2>Cons</h2><ul id="cons"></ul></div>
+      </div>
+      <details class="card" id="how">
+        <summary>How this report was made</summary>
+        <ol id="trace"></ol>
+        <div id="rejected-block" class="hidden">
+          <h3>Rejected by the validator</h3>
+          <ul id="rejected"></ul>
+        </div>
+      </details>
+    </section>
+
+    <footer>
+      Read-only, public data only. A model drafts the points; a validator keeps only those whose quote appears word for word in the comment cited.
+      <a href="https://github.com/eshitakundu/DevPulse">Source on GitHub</a> · <a href="/docs">API</a>
+    </footer>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
