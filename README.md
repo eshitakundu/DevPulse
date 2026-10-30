@@ -4,11 +4,11 @@
 
 **What do developers actually say about a tool? DevPulse reads the Hacker News threads about it and returns pros and cons where every point quotes a real comment and links to it.**
 
-```bash
-devpulse "Bun"
-```
+**[Try it live](https://devpulse.eshita-kundu-2026.workers.dev/?tool=Bun)** · runs as a Python Worker on Cloudflare · or from the terminal: `devpulse "Bun"`
 
 AI summaries of "what people think" are easy to make and easy to fake: a model can invent a quote or attach a real quote to the wrong person. DevPulse treats the model's answer as a proposal. A validator keeps a point only if its quote appears word for word in the comment it cites, and anything that fails is sent back once for repair, then dropped.
+
+![DevPulse live: pros and cons for Bun, each quoting and linking a Hacker News comment](docs/screenshot.png)
 
 [Sample report for Bun](docs/sample-report-bun.md) (real HN data, rule-based analyst).
 
@@ -62,7 +62,7 @@ What this does and doesn't show: the guardrails hold however the model fails. It
 
 ## Tests
 
-18 pytest tests with mocked HTTP (no network): whole-word tool matching, HTML cleaning, retrieval scoping, every validator rule, negation and mixed-sentence handling in the baseline, one repair round with feedback, fallbacks on timeouts and all-rejected answers, and Markdown links to every cited comment.
+21 pytest tests with mocked HTTP (no network): whole-word tool matching, HTML cleaning, retrieval scoping, every validator rule, negation and mixed-sentence handling in the baseline, one repair round with feedback, fallbacks on timeouts and all-rejected answers, Markdown links to every cited comment, and the web API (per-tool caching, no caching of empty results, input validation).
 
 ## Run it
 
@@ -81,6 +81,20 @@ python evals/guardrails.py
 ```
 
 `DEVPULSE_MODEL` picks the OpenRouter model (default `openrouter/auto`). `--threads` sets how many HN threads to read (default 3).
+
+## Hosting
+
+The live demo is the same Python package running on [Cloudflare Python Workers](https://developers.cloudflare.com/workers/languages/python/): `src/worker.py` wraps the FastAPI app in `src/devpulse/web.py`, static files in `public/` are served by Workers Assets, and reports are cached in a D1 database for 24 hours so repeat lookups don't spend model quota. The web page inserts all comment text with `textContent`, never as HTML, since HN comments are untrusted.
+
+```bash
+uv sync --group workers
+uv run pywrangler dev                                   # local Worker with a local D1
+npx wrangler d1 create devpulse                         # once; put the id in wrangler.jsonc
+npx wrangler secret put OPENROUTER_API_KEY --name devpulse   # optional, enables the model
+uv run pywrangler deploy
+```
+
+Run the API without Cloudflare: `uvicorn devpulse.web:create_app --factory`.
 
 ## Limitations
 
