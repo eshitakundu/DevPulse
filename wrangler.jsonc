@@ -12,8 +12,7 @@
     {
       "binding": "DB",
       "database_name": "devpulse",
-      // Replaced with the real id after `wrangler d1 create devpulse`.
-      "database_id": "00000000-0000-0000-0000-000000000000"
+      "database_id": "672ca985-5699-4480-9a1e-8e5395969551"
     }
   ],
   "observability": { "enabled": true }

@@ -13,7 +13,10 @@ function renderPoints(list, points, comments) {
   const byRef = Object.fromEntries(comments.map((c) => [c.ref, c]));
   for (const point of points) {
     const item = el("li");
-    item.append(el("strong", point.point));
+    // The rule-based analyst uses the quote itself as the point; don't show it twice.
+    const sameAsQuote = point.point.replace(/\.\.\.$/, "") === point.quote.slice(0, point.point.length - 3) ||
+      point.point === point.quote;
+    if (!sameAsQuote) item.append(el("strong", point.point));
     const quote = el("blockquote", `"${point.quote}"`);
     const sources = el("span", "", "sources");
     point.cites.filter((ref) => byRef[ref]).forEach((ref, i) => {
