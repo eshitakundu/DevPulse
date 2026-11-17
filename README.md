@@ -58,6 +58,21 @@ fall back ─ model error, timeout, bad JSON, or nothing grounded survived?
 
 **Ungrounded points published: 0 of 8 scenarios.**
 
+### Live run (17 Nov 2026, production site)
+
+[`evals/live_bench.py`](evals/live_bench.py) asked the live site about 20 developer tools, each twice: once fresh, once from the 24 h cache. Raw results: [`evals/results/live-2026-11-17.json`](evals/results/live-2026-11-17.json).
+
+| Measure | Result |
+|---|---|
+| Reports returned | 19 / 20 (1 transient 503) |
+| Written by the model (passed the validator) | 18 / 19 |
+| Fell back to the rule-based analyst | 1 / 19 (Go) |
+| Points published | 149, every one quoted word for word from its cited comment |
+| Fresh report, median / p90 | 17.8 s / 22.6 s |
+| Cached report, median | 0.27 s (about 65x faster) |
+
+Each fresh report read 40 comments from 3 Hacker News threads.
+
 What this does and doesn't show: the guardrails hold however the model fails. It does not measure summary quality. The rule-based analyst is crude: it picks sentences by keywords, so it surfaces side remarks and can't summarise across comments (see the sample report). That gap is what the model is for, and a quality comparison against labelled threads is the next eval to add.
 
 ## Tests
